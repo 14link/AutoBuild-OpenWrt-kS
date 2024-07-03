@@ -156,6 +156,10 @@ jobs:
         echo -e "$(nproc) thread build."
         make -j$(nproc) V=s
 
+    - name: Check space usage
+      if: (!cancelled())
+      run: df -hT
+
     - name : Upload artifact
       uses: actions/upload-artifact@master
       with:
