@@ -118,7 +118,7 @@ jobs:
         ./scripts/feeds install -a
         ./scripts/feeds install -a
         rm -rf package/lean/autosamba
-        rm -rf package/feeds/applications/luci-app-netdata
+        rm -rf feeds/luci/applications/luci-app-netdata
         
     #- name: Import external feeds     #调整&&去重,删除不使用的源文件
     #  working-directory: ./openwrt
@@ -142,6 +142,8 @@ jobs:
         git clone https://github.com/sirpdboy/autosamba package/autosamba
         git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
         git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
+    #    rm -rf package/lean/autosamba
+    #    rm -rf feeds/luci/applications/luci-app-netdata
     
     - name: Configuration Customization - Build_x86_64
       env:
