@@ -108,7 +108,8 @@ jobs:
         rm -rf ./package/lean/autosamba
         rm -rf ./package/feeds/applications/luci-app-netdata
         
-    #- name: Import external feeds     #调整&&去重,删除不使用的源文件
+    #调整&&去重,删除不使用的源文件
+    #- name: Import external feeds 
     #  working-directory: ./openwrt
     #  run: |
     #    git clone https://github.com/sirpdboy/luci-app-netdata ./package/luci-app-netdata
@@ -177,6 +178,7 @@ jobs:
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
+#        find -name "*profiles.json*" | xargs -i rm -rf {}
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
