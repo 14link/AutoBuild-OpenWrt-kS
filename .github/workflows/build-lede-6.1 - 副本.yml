@@ -117,11 +117,7 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         ./scripts/feeds install -a
-        rm -rf package/lean/autosamba
-        rm -rf feeds/luci/applications/luci-app-netdata
-
         
-    #调整&&去重,删除不使用的源文件
     #- name: Import external feeds 
     #  working-directory: ./openwrt
     #  run: |
