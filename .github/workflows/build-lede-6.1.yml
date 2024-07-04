@@ -110,8 +110,8 @@ jobs:
         echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
         
     - name: Update & Install feeds & del double feeds
-      working-directory: ./openwrt
       run: |
+        cd openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
@@ -127,8 +127,8 @@ jobs:
     #    git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
         
     - name: Import external feeds
-      working-directory: ./openwrt
       run: |
+        cd openwrt
         git clone https://github.com/sirpdboy/autosamba package/autosamba
         git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
         git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
@@ -149,14 +149,14 @@ jobs:
         prefix: ${{ github.workspace }}/openwrt
         
     - name: Download package
-      working-directory: ./openwrt
       run: |
+        cd openwrt
         make download -j$(nproc)
         find dl -size -1024c -exec rm -f {} \;
 
     - name: Build firmware
-      working-directory: ./openwrt
       run: |
+        cd openwrt
         echo -e "$(nproc) thread build."
         make -j$(nproc) V=s
 
