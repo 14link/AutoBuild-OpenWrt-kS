@@ -29,6 +29,7 @@ env:
   UPLOAD_COWTRANSFER: false
   UPLOAD_WETRANSFER: false
   UPLOAD_RELEASE: true
+  CACHE_ACCELERATE: true
   TZ: Asia/Shanghai
 #  REPO_URL: https://github.com/coolsnowwolf/lede
 #  REPO_BRANCH: master
@@ -141,11 +142,14 @@ jobs:
         chmod +x ./customize.sh && ./customize.sh
         cd openwrt && make defconfig
 
-    - name: 加载缓存
-      if: env.USE_CACHEWRTBUILD == 'true'
+    - name: Accelerate
+      if: env.CACHE_ACCELERATE == 'true'
       uses: klever1988/cachewrtbuild@main
       with:
-        ccache: 'true'
+        ccache: false
+        toolchain: true
+        skip: true
+        clean: true
         prefix: ${{ github.workspace }}/openwrt
         
     - name: Download package
