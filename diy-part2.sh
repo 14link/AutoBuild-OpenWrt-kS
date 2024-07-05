@@ -29,6 +29,7 @@ sed -i "s/hostname='OpenWrt'/hostname='OpenWrt-kS'/g" ./package/base-files/files
 rm -rf ./package/lean/autosamba
 rm -rf ./feeds/luci/applications/luci-app-netdata
 # rm -rf ./feeds/small/*bypass* ./feeds/small/*vssr*
+# rm -rf ./feeds/small/*bypass* ./feeds/small/*vssr* ./feeds/small/luci-app-ssr-plus
 # rm -rf package/lean/autosamba
 
 git clone https://github.com/sirpdboy/autosamba package/autosamba
