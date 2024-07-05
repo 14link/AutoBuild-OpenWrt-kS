@@ -121,6 +121,7 @@ jobs:
     #    echo "src-git ssrp https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
         
     - name: Update & Install feeds & del double feeds #调整&&去重,删除不使用的源文件
+      working-directory: ./openwrt        
       run: |
         ./scripts/feeds update -a
         ./scripts/feeds install -a
