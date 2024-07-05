@@ -122,7 +122,6 @@ jobs:
         
     - name: Update & Install feeds & del double feeds #调整&&去重,删除不使用的源文件
       run: |
-        cd openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         ./scripts/feeds install -a
