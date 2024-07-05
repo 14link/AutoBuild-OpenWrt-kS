@@ -1,47 +1,51 @@
 #=================================================
-# https://github.com/P3TERX/Actions-OpenWrt
 # Description: Build OpenWrt using GitHub Actions
 # Lisence: MIT
-# Author: P3TERX
-# Blog: https://p3terx.com
+# Author: eSirPlayground
+# Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: OpenWrt-lede6.x
+name: Build-lede-6.1
 
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
+#  release:
+#    types: [published]
+
+#  push:
+#    branches: 
+#      - master
+
 #  schedule:
-#    - cron: 0 22 */3 * * 
+#    - cron: 0 18 * * 1
+  
+  #watch:
+  #  types: [started]
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
-  FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: x86_64.config
-  DIY_P1_SH: diy-part1.sh
-  DIY_P2_SH: diy-part2.sh
-  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
+  UPLOAD_COWTRANSFER: false
   UPLOAD_WETRANSFER: false
   UPLOAD_RELEASE: true
-  CACHE_ACCELERATE: true
   TZ: Asia/Shanghai
+#  REPO_URL: https://github.com/coolsnowwolf/lede
+#  REPO_BRANCH: master
+#  FEEDS_CONF: feeds.conf.default
+#  CONFIG_FILE: x86_64.config
+#  DIY_P1_SH: diy-part1-lede.sh
+#  DIY_P2_SH: diy-p2-lede.sh
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+
+  build_openwrt:
+
+    name: Build OpenWrt Firmware
+
+    runs-on: ubuntu-latest
 
     steps:
-    - name: 检查项目分支
-      uses: actions/checkout@main
-
     - name: Check Server Performance
       run: |
         echo "警告⚠"
@@ -55,117 +59,116 @@ jobs:
         echo -e "$(sudo lshw -short -C memory | grep GiB) \n"
         echo "--------------------------硬盘信息--------------------------"
         echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT  
-    
-    - name: 清理磁盘空间
-      uses: jlumbroso/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: true
-
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
-    
-    - name: 安装编译环境
+     
+    - name: free disk space
+      run: | 
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo apt clean
+        docker rmi $(docker image ls -aq)
+        df -h
+        
+    - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        df -hT
-        sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
-        sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* adoptopenjdk* mysql* php* mongodb* dotnet* moby* snapd* || true
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL https://github.com/firkerword/openwrt-list/raw/master/depends-ubuntu-2004)
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
-        sudo timedatectl set-timezone "$TZ"
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
-        df -hT
-    - name: 下载固件源码
-      working-directory: /workdir
-      run: |
-        df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
-        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-        cd openwrt
-        useVersionInfo=$(git show -s --date=short --format="%0AAuthor: %an%0Adate: %cd%0Acommit: %s%0Acommit hash: %H")
-        echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
-        echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV   
-    - name: 加载自定义设置
-      run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        chmod +x $DIY_P1_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P1_SH
-    - name: 下载插件
-      run: cd openwrt && ./scripts/feeds update -a
+        set +e
+        docker rmi `docker images -q`
+        echo "Deleting files, please wait ..."
+        sudo rm -rf \
+          /usr/share/dotnet \
+          /usr/local/lib/android \
+          /opt/ghc \
+          /etc/mysql \
+          /etc/php
+        sudo -E apt-get -y purge azure-cli* docker* ghc* zulu* hhvm* llvm* firefox* google* dotnet* aspnetcore* powershell* openjdk* adoptopenjdk* mysql* php* mongodb* moby* snap* || true
+        sudo -E apt-get update
+        sudo -E apt-get -y install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev qemu-img
+        sudo -E apt-get -y autoremove --purge
+        sudo -E apt-get clean
+        sudo -E timedatectl set-timezone "Asia/Shanghai"
 
-    - name: 读取插件
-      run: cd openwrt && ./scripts/feeds install -a
-
-    - name: Accelerate
-      if: env.CACHE_ACCELERATE == 'true'
-      uses: klever1988/cachewrtbuild@main
-      with:
-        ccache: true
-        toolchain: true
-        skip: true
-        clean: true
-        prefix: ${{ github.workspace }}/openwrt
+    - name: Checkout OpenWrt
+      uses: actions/checkout@main
         
-    - name: 更改设置 && files文件大法
+    - name: Clone source code
+      env: 
+        REPO_URL: https://github.com/coolsnowwolf/lede
+        REPO_BRANCH: master
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x $DIY_P2_SH
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P2_SH
-    - name: SSH链接管理
-      uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        echo "src-git kenzo https://github.com/kenzok8/openwrt-packages" >> ./feeds.conf.default
+        echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
+        echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
+    #    git clone https://github.com/sirpdboy/autosamba package/autosamba
+    #    git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
+    #    git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
 
-    - name: 下载安装包
-      id: package
+    #    sed -i '$a src-git diypkg https://github.com/14link/diy-package' feeds.conf.default
+       
+    #    echo "src-git passwall https://github.com/xiaorouji/openwrt-passwall" >> ./feeds.conf.default
+    #    echo "src-git helloworld https://github.com/fw876/helloworld" >> ./feeds.conf.default
+    #    echo "src-git ssrp https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
+        
+    - name: Update & Install feeds & del double feeds
+      working-directory: ./openwrt
       run: |
-        cd openwrt
-        make defconfig
-        make download -j8
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        ./scripts/feeds install -a
+        
+    #- name: Import external feeds 
+    #  working-directory: ./openwrt
+    #  run: |
+    #    git clone https://github.com/sirpdboy/luci-app-netdata ./package/luci-app-netdata
+     
+    #- name: Import external feeds - passwall
+    #  working-directory: ./openwrt
+    #  run: |
+    #    git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
+    #    git clone "your_github_link" package/"your_folder_name"      
+
+    #- name: Import external feeds - JerryKuKu Argon
+    #  working-directory: ./openwrt
+    #  run: |
+    #    git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
+
+    - name: Import external feeds
+      working-directory: ./openwrt
+      run: |
+        git clone https://github.com/sirpdboy/autosamba package/autosamba
+        git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
+        git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
+    
+    - name: Configuration Customization - Build_x86_64
+      env:
+        CONFIG_FILE: 'x86_64.config'
+      run: |
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x ./customize.sh && ./customize.sh
+        cd openwrt && make defconfig
+        
+    - name: Download package
+      working-directory: ./openwrt
+      run: |
+        make download -j$(nproc)
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-    - name: 开始编译固件
-      id: compile
+
+    - name: Build firmware
+      working-directory: ./openwrt
       run: |
-        cd openwrt
-        echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
-        echo "status=success" >> $GITHUB_OUTPUT
-        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-        echo "FILE_TIME=$(date "+%Y年%m月%d日-%H点")" >> $GITHUB_ENV
-        echo "TAG_TIME=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-    - name: 查看磁盘使用情况
-      if: (!cancelled())
-      run: df -hT
+        echo -e "$(nproc) thread build."
+        make -j$(nproc) V=s
 
-    - name: 上传bin压缩目录
-      uses: actions/upload-artifact@main
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+    - name : Upload artifact
+      uses: actions/upload-artifact@master
       with:
-        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt/bin/packages/x86_64
+        name: OpenWrt
+        path: openwrt/bin
 
-    - name: 整理编译好的固件
+    - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
@@ -176,60 +179,57 @@ jobs:
         find -name "*rootfs*" | xargs -i mv -f {} packages
         find -name "*.manifest*" | xargs -i mv -f {} packages
         find -name "*vmlinuz*" | xargs -i mv -f {} packages
-        find -name "*esxi.vmdk*" | xargs -i mv -f {} packages
+        find -name "*esxi.vmdk*" | xargs -i mv -f {} packages      
+        find -name "*sha256sums*" | xargs -i rm -rf {}
+        find -name "*version.buildinfo*" | xargs -i rm -rf {}
+        find -name "*feeds.buildinfo*" | xargs -i rm -rf {}
+        find -name "*profiles.json*" | xargs -i rm -rf {}
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
-    - name: 上传固件到github
+#        find -name "*profiles.json*" | xargs -i rm -rf {}
+
+    - name: Upload firmware directory
       uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_6.1D${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
-
-
-    - name: 上传固件到WT网盘
-      id: wetransfer
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh
-        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-        echo "url=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
-    
-    - name: 发布至release
-      id: release
-      uses: ncipollo/release-action@v1
+ 
+    - name: Generate release tag
+      id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+        touch release.txt
+        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
+        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+        echo "status=success" >> $GITHUB_OUTPUT
+       
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v2
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
-        name: ${{ env.FILE_TIME }} 「 openwrt-6.1-X86-64 」
-        allowUpdates: true
-        tag: ${{ env.TAG_TIME }}
-        commit: main
-        token: ${{ secrets.REPO_TOKEN }}
-        body: |
-          功能介绍：含Docker、Passwall、MosDNS、lucky、定时设置等插件。
-          [固件源码](https://github.com/coolsnowwolf/lede)
-          由衷感谢所有为openwrt无私奉献的大佬们
-          📥 固件下载
-          🔗 [国外WT网盘](${{ steps.wetransfer.outputs.url }})
-        artifacts: ${{ env.FIRMWARE }}/*
+        name: ${{ env.FILE_TIME }} 「 openwrt-lede-6.1-X86-64 」     
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        body_path: release.txt
+        files: ${{ env.FIRMWARE }}/*
 
-    - name: 清理旧的workflow
+    - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@v2
       with:
         token: ${{ secrets.REPO_TOKEN }}
-        retain_days: 180
-        keep_minimum_runs: 10
-
-    - name: 删除旧的Releases
-      uses: dev-drprasad/delete-older-releases@v0.3.2
+        repository: ${{ github.repository }}
+        retain_days: 1
+        keep_minimum_runs: 45
+        
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@master
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 9
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-        
-#    - name: TG推送
-#      run: curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&text=🅰️恭喜主人X86-openwrt6.6自用版固件编译完成！🎉%0A⏰编译时间：${{ env.DATE }}%0A📥下载地址：https://github.com/firkerword/openwrt-Exclusive/releases/tag/${{ env.TAG_TIME }}"
