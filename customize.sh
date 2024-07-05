@@ -18,5 +18,5 @@ sed -i "s/hostname='OpenWrt'/hostname='OpenWrt-kS'/g" openwrt/package/base-files
 #3. Replace with JerryKuKu’s Argon
 	#	 rm openwrt/package/lean/luci-theme-argon -rf
 #调整&&去重,删除不使用的源文件
-rm -rf openwrt/package/lean/autosamba
-rm -rf openwrt/feeds/luci/applications/luci-app-netdata
+#rm -rf openwrt/package/lean/autosamba
+#rm -rf openwrt/feeds/luci/applications/luci-app-netdata
