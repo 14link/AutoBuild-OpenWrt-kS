@@ -123,7 +123,6 @@ jobs:
         $GITHUB_WORKSPACE/customize.sh
         
     - name: Download package
-      working-directory: ./openwrt
       run: |
         cd openwrt && make defconfig
         make download -j$(nproc)
