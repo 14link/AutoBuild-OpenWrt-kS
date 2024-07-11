@@ -24,6 +24,8 @@ on:
         required: false
         default: 'false'
         type: boolean
+env: 
+  TZ: Asia/Shanghai
 
 jobs:
   build:
