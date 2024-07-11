@@ -91,6 +91,9 @@ jobs:
         swap-storage: true
 
     - name: Clone source code
+      env: 
+        REPO_URL: https://github.com/coolsnowwolf/lede
+        REPO_BRANCH: master
       working-directory: /workdir
       run: |
         df -hT $PWD
