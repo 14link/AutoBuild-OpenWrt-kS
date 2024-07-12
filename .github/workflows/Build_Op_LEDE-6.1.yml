@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build_Op_lede_5.15
+name: Build_Op_lede_6.1
 
 on:
   repository_dispatch:
