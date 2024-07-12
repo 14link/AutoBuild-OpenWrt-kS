@@ -127,8 +127,6 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         ./scripts/feeds install -a
-        rm -rf ./package/lean/autosamba
-        rm -rf ./package/feeds/applications/luci-app-netdata
         
     - name: Configuration Customization - Build_x86_64
       env:
