@@ -105,6 +105,7 @@ jobs:
         git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
         git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
         sed -i 's/PATCHVER:=6.1/PATCHVER:=5.15/g' target/linux/x86/Makefile
+        sed -i 's/PATCHVER:=6.6/PATCHVER:=5.15/g' target/linux/x86/Makefile
     #    sed -i '$a src-git diypkg https://github.com/14link/diy-package' feeds.conf.default
 
     #    sed -i 's/PATCHVER:=5.15/PATCHVER:=5.4/g' target/linux/x86/Makefile
