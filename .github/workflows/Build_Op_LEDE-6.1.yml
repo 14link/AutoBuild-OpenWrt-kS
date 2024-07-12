@@ -59,7 +59,7 @@ jobs:
         echo -e "$(sudo lshw -short -C memory | grep GiB) \n"
         echo "--------------------------硬盘信息--------------------------"
         echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT  
-        
+     
     - name: free disk space
       run: | 
         sudo swapoff -a
@@ -98,7 +98,7 @@ jobs:
         haskell: true
         large-packages: true
         swap-storage: true
-        
+
     - name: Clone source code
       env: 
         REPO_URL: https://github.com/coolsnowwolf/lede
@@ -117,7 +117,7 @@ jobs:
         
     - name: 缓存加速
       uses: stupidloud/cachewrtbuild@main
-      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')      
+      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
       with:
         ccache: 'true'
         prefix: ${{ github.workspace }}/openwrt
