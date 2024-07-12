@@ -29,6 +29,7 @@ env:
   UPLOAD_COWTRANSFER: false
   UPLOAD_WETRANSFER: false
   UPLOAD_RELEASE: true
+  CACHE_BUILD: true
   TZ: Asia/Shanghai
 #  REPO_URL: https://github.com/coolsnowwolf/lede
 #  REPO_BRANCH: master
@@ -116,6 +117,7 @@ jobs:
         
     - name: 缓存加速
       uses: stupidloud/cachewrtbuild@main
+      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')      
       with:
         ccache: 'true'
         prefix: ${{ github.workspace }}/openwrt
