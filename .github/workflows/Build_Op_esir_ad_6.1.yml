@@ -12,6 +12,15 @@ on:
   repository_dispatch:
   workflow_dispatch:
 
+env:
+  UPLOAD_BIN_DIR: true
+  UPLOAD_FIRMWARE: true
+  UPLOAD_COWTRANSFER: false
+  UPLOAD_WETRANSFER: false
+  UPLOAD_RELEASE: true
+  CACHE_BUILD: true
+  TZ: Asia/Shanghai
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,6 +28,28 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
+
+    - name: Check Server Performance
+      run: |
+        echo "警告⚠"
+        echo "分配的服务器性能有限，若选择的插件过多，务必注意CPU性能！"
+        echo -e "已知CPU型号（降序）：AMD EPYC 7763, 8370C，8272CL，8171M，E5-2673 \n"
+        echo "--------------------------CPU信息--------------------------"
+        echo "CPU物理数量：$(cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l)"
+        echo -e "CPU核心信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+        echo "--------------------------内存信息--------------------------"
+        echo "已安装内存详细信息："
+        echo -e "$(sudo lshw -short -C memory | grep GiB) \n"
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT  
+     
+    - name: free disk space
+      run: | 
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo apt clean
+        docker rmi $(docker image ls -aq)
+        df -h
 
     - name: Initialization environment
       env:
@@ -38,6 +69,26 @@ jobs:
         sudo -E apt-get -y install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev qemu-img
         sudo -E apt-get -y autoremove --purge
         sudo -E apt-get clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        echo
+        echo " 系统空间      类型   总数  已用  可用 使用率"
+        df -hT $PWD
+
+    - name: 释放Ubuntu磁盘空间
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: true
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
 
     - name: Clone source code
       env: 
@@ -45,9 +96,25 @@ jobs:
         REPO_BRANCH: master
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
-        echo "src-git ssrp https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
+        echo "src-git kenzo https://github.com/kenzok8/openwrt-packages" >> ./feeds.conf.default
+        echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
+        echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
+        git clone https://github.com/sirpdboy/autosamba package/autosamba
+        git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
+        git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
+        sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile    
+    #    echo "src-git ssrp https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
         
+    - name: 缓存加速
+      uses: stupidloud/cachewrtbuild@main
+      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
+      with:
+        ccache: 'true'
+        prefix: ${{ github.workspace }}/openwrt
+
+
     - name: Update & Install feeds
       working-directory: ./openwrt
       run: |
@@ -68,7 +135,7 @@ jobs:
 
     - name: Configuration Customization - Build_x86_64
       env:
-        CONFIG_FILE: 'x86_64.config'
+        CONFIG_FILE: x86_64.config
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./customize.sh && ./customize.sh
