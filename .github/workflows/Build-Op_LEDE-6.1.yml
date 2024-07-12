@@ -123,15 +123,6 @@ jobs:
         echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
         echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
         sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
-    #    git clone https://github.com/sirpdboy/autosamba package/autosamba
-    #    git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
-    #    git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
-
-    #    sed -i '$a src-git diypkg https://github.com/14link/diy-package' feeds.conf.default
-       
-    #    echo "src-git passwall https://github.com/xiaorouji/openwrt-passwall" >> ./feeds.conf.default
-    #    echo "src-git helloworld https://github.com/fw876/helloworld" >> ./feeds.conf.default
-    #    echo "src-git ssrp https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
         
     - name: 缓存加速
       uses: stupidloud/cachewrtbuild@main
@@ -145,22 +136,6 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         ./scripts/feeds install -a
-        
-    #- name: Import external feeds 
-    #  working-directory: ./openwrt
-    #  run: |
-    #    git clone https://github.com/sirpdboy/luci-app-netdata ./package/luci-app-netdata
-     
-    #- name: Import external feeds - passwall
-    #  working-directory: ./openwrt
-    #  run: |
-    #    git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
-    #    git clone "your_github_link" package/"your_folder_name"      
-
-    #- name: Import external feeds - JerryKuKu Argon
-    #  working-directory: ./openwrt
-    #  run: |
-    #    git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
 
     - name: Import external feeds
       working-directory: ./openwrt
