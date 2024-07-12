@@ -93,6 +93,20 @@ jobs:
         echo " 系统空间      类型   总数  已用  可用 使用率"
         df -hT $PWD
 
+    - name: 释放Ubuntu磁盘空间
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: true
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
+
     - name: Checkout OpenWrt
       uses: actions/checkout@main
         
@@ -119,6 +133,12 @@ jobs:
     #    echo "src-git helloworld https://github.com/fw876/helloworld" >> ./feeds.conf.default
     #    echo "src-git ssrp https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
         
+    - name: 缓存加速
+      uses: stupidloud/cachewrtbuild@main
+      with:
+        ccache: 'true'
+        prefix: ${{ github.workspace }}/openwrt
+
     - name: Update & Install feeds & del double feeds
       working-directory: ./openwrt
       run: |
