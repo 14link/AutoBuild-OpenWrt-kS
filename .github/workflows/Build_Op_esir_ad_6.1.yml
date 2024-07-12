@@ -122,6 +122,8 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         ./scripts/feeds install -a
+        rm -rf ./package/lean/autosamba
+        rm -rf ./package/feeds/applications/luci-app-netdata
 
     #- name: Import external feeds - JerryKuKu Argon
     #  working-directory: ./openwrt
