@@ -52,13 +52,13 @@ jobs:
         echo "--------------------------硬盘信息--------------------------"
         echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT  
      
-    - name: free disk space
-      run: | 
-        sudo swapoff -a
-        sudo rm -f /swapfile
-        sudo apt clean
-        docker rmi $(docker image ls -aq)
-        df -h
+    # - name: free disk space
+      # run: | 
+        # sudo swapoff -a
+        # sudo rm -f /swapfile
+        # sudo apt clean
+        # docker rmi $(docker image ls -aq)
+        # df -h
 
     - name: Initialization environment
       env:
