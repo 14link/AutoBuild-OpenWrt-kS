@@ -12,8 +12,18 @@ on:
   repository_dispatch:
   workflow_dispatch:
 
+env:
+  UPLOAD_BIN_DIR: true
+  UPLOAD_FIRMWARE: true
+  UPLOAD_COWTRANSFER: false
+  UPLOAD_WETRANSFER: false
+  UPLOAD_RELEASE: true
+  CACHE_BUILD: true
+  TZ: Asia/Shanghai
+
 jobs:
   build:
+    name: Build_OP_x86_64
     runs-on: ubuntu-latest
 
     steps:
