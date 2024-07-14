@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: OpenWrt X86_64
+name: OpenWrt X86_64 P3TERX
 
 on:
   repository_dispatch:
