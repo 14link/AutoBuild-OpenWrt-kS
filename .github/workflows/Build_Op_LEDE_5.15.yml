@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build_Op_lede_5.15
+name: Build_Op_lede_esir_5.15
 
 on:
   repository_dispatch:
@@ -40,7 +40,7 @@ env:
 
 jobs:
   build:
-    name: Build_Op_lede_5.15
+    name: Build_Op_lede_esir_5.15
     runs-on: ubuntu-22.04
 
     steps:
