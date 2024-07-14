@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build_OpenWrt_lede_esir_6.1
+name: Build_OpenWrt_lede_6.1 by esir
 
 # Add a button to trigger the workflow
 on:
@@ -41,7 +41,7 @@ env:
 
 jobs:
   build:
-    name: Build_OpenWrt_lede_esir_6.1
+    name: Build_OpenWrt_lede_6.1 by esir
     runs-on: ubuntu-22.04
 
     steps:
