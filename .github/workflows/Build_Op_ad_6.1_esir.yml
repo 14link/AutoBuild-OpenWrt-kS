@@ -12,6 +12,19 @@ on:
   repository_dispatch:
   workflow_dispatch:
 
+#  release:
+#    types: [published]
+
+#  push:
+#    branches: 
+#      - master
+
+#  schedule:
+#    - cron: 0 15 * * 5
+  
+  #watch:
+  #  types: [started]
+
 env:
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
