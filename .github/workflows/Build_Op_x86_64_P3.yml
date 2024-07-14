@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: OpenWrt X86_64 P3TERX
+name: OpenWrt X86_64 P3
 
 on:
   repository_dispatch:
@@ -44,7 +44,7 @@ env:
 
 jobs:
   build:
-    name: Build OpenWrt P3TERX
+    name: Build OpenWrt P3
     runs-on: ubuntu-22.04
 
     steps:
