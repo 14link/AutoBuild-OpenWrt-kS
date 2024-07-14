@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build OpenWrt_x86_64 by esir
+name: Build OpenWrt_x86_64_es
 
 # Add a button to trigger the workflow
 on: 
@@ -36,7 +36,7 @@ env:
 
 jobs:
   build:
-    name: Build OpenWrt_x86_64 by esir
+    name: Build OpenWrt_x86_64_es
     runs-on: ubuntu-22.04
 
     steps:

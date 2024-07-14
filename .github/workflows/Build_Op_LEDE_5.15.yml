@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build_OpenWrt_lede_5.15 by esir
+name: Build_OpenWrt_lede_5.15_es
 
 on:
   repository_dispatch:
@@ -40,7 +40,7 @@ env:
 
 jobs:
   build:
-    name: Build_OpenWrt_lede_5.15 by esir
+    name: Build_OpenWrt_lede_5.15_es
     runs-on: ubuntu-22.04
 
     steps:
