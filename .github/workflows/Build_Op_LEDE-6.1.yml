@@ -19,7 +19,7 @@ on:
       # - main
 
   schedule:
-    - cron: 0 20 * * 0,2,4,6
+    - cron: 30 20 * * 0,2,4,6
   
   #watch:
   #  types: [started]
