@@ -239,7 +239,7 @@ jobs:
       uses: Mattraks/delete-workflow-runs@main
       with:
         retain_days: 90
-        keep_minimum_runs: 20
+        keep_minimum_runs: 25
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@master
