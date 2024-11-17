@@ -129,10 +129,10 @@ jobs:
       working-directory: ./openwrt
       run: |
         ./scripts/feeds update -a
-        ./scripts/feeds install -a
-        ./scripts/feeds install -a
         rm -rf ./package/lean/autosamba
         rm -rf ./package/feeds/applications/luci-app-netdata
+        ./scripts/feeds install -a
+        ./scripts/feeds install -a
 
     #- name: Import external feeds - passwall
     #  working-directory: ./openwrt
