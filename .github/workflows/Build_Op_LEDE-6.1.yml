@@ -130,6 +130,8 @@ jobs:
         rm -rf feeds/packages/utils/v2dat
         rm -rf feeds/packages/lang/golang
         git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
+        git clone https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
+        git clone -b js https://github.com/sirpdboy/luci-theme-kucat.git package/luci-theme-kucat
         ./scripts/feeds install -a 
         ./scripts/feeds install -a
 
