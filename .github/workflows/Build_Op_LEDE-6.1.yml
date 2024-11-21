@@ -110,6 +110,7 @@ jobs:
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
+        echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
         echo "src-git kenzo https://github.com/kenzok8/openwrt-packages" >> ./feeds.conf.default
         echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
         ./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
@@ -117,7 +118,10 @@ jobs:
         rm -rf feeds/packages/utils/v2dat
         rm -rf feeds/packages/lang/golang
         git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
-        echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
+        rm -rf ./package/lean/autosamba
+        git clone https://github.com/sirpdboy/autosamba package/autosamba
+        rm -rf ./feeds/luci/applications/luci-app-netdata
+        git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
         sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
         
     - name: 缓存加速
