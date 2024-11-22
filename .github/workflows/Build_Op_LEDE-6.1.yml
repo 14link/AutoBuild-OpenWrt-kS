@@ -118,9 +118,9 @@ jobs:
         rm -rf feeds/packages/utils/v2dat
         rm -rf feeds/packages/lang/golang
         git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
-        rm -rf ./package/lean/autosamba
+        rm -rf package/lean/autosamba
         git clone https://github.com/sirpdboy/autosamba package/autosamba
-        rm -rf ./feeds/luci/applications/luci-app-netdata
+        rm -rf feeds/luci/applications/luci-app-netdata
         git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
         sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
         
