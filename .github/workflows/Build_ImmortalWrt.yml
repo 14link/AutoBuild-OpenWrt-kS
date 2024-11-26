@@ -43,7 +43,7 @@ env:
 jobs:
   build:
     name: Build_ImmortalWrt-23.05
-    runs-on: ubuntu-22.04
+    runs-on: debian-11.10
 
     steps:
     - name: Checkout
