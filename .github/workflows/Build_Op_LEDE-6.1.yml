@@ -121,7 +121,7 @@ jobs:
         rm -rf package/lean/autosamba
         git clone https://github.com/sirpdboy/autosamba package/autosamba
         git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
-        sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
+    #    sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
         
     - name: 缓存加速
       uses: stupidloud/cachewrtbuild@main
@@ -133,7 +133,7 @@ jobs:
     - name: Update & Install feeds & del double feeds 
       working-directory: ./openwrt
       run: |
-        git clone https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
+        git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
         ./scripts/feeds install -a 
         ./scripts/feeds install -a
 
