@@ -5,20 +5,22 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build_OpenWrt_lede_5.15
+name: Build_OpenWrt_lede_5.10
 
+# Add a button to trigger the workflow
 on:
   repository_dispatch:
   workflow_dispatch:
 #  release:
 #    types: [published]
 
-#  push:
-#    branches: 
-#      - master
+  # push:
+    # branches: 
+      # - main
 
 #  schedule:
-#    - cron: 0 15 * * 5
+#    - cron: 0 0 * * 0
+#    - cron: 0 0 * * 5,6,0
   
   #watch:
   #  types: [started]
@@ -40,7 +42,7 @@ env:
 
 jobs:
   build:
-    name: Build_OpenWrt_lede_5.15
+    name: Build_OpenWrt_lede_5.10
     runs-on: ubuntu-22.04
 
     steps:
@@ -76,7 +78,7 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
         sudo docker image prune --all --force
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -108,14 +110,12 @@ jobs:
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
-        echo "src-git kenzo https://github.com/kenzok8/openwrt-packages" >> ./feeds.conf.default
         echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
+        echo "src-git istore https://github.com/linkease/istore;main" >> ./feeds.conf.default
         echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
-        git clone https://github.com/sirpdboy/autosamba package/autosamba
-        git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
-        git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
-        sed -i 's/PATCHVER:=6.1/PATCHVER:=5.15/g' target/linux/x86/Makefile
-        sed -i 's/PATCHVER:=6.6/PATCHVER:=5.15/g' target/linux/x86/Makefile
+        sed -i 's/PATCHVER:=6.1/PATCHVER:=5.10/g' target/linux/x86/Makefile
+        sed -i 's/PATCHVER:=6.6/PATCHVER:=5.10/g' target/linux/x86/Makefile
+    #    sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
         
     - name: 缓存加速
       uses: stupidloud/cachewrtbuild@main
@@ -128,11 +128,19 @@ jobs:
       working-directory: ./openwrt
       run: |
         ./scripts/feeds update -a
-        ./scripts/feeds install -a
-        ./scripts/feeds install -a
-        rm -rf ./package/lean/autosamba
-        rm -rf ./package/feeds/applications/luci-app-netdata
-        
+        ./scripts/feeds install -a 
+
+    #- name: Import external feeds - passwall
+    #  working-directory: ./openwrt
+    #  run: |
+    #    git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
+    #    git clone "your_github_link" package/"your_folder_name"      
+
+    #- name: Import external feeds - JerryKuKu Argon
+    #  working-directory: ./openwrt
+    #  run: |
+    #    git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
+
     - name: Configuration Customization - Build_x86_64
       env:
         CONFIG_FILE: 'x86_64.config'
@@ -152,7 +160,7 @@ jobs:
       working-directory: ./openwrt
       run: |
         echo -e "$(nproc) thread build."
-        make -j$(nproc) V=s
+        make -j$(nproc) || make -j1 || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
@@ -174,7 +182,7 @@ jobs:
       with:
         name: OpenWrt_ipk${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin/packages/x86_64
- 
+        
     - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
@@ -219,7 +227,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
-        name: 「 openwrt-5.15-X86-64 」 ${{ steps.tag.outputs.release_tag }}
+        name: 「 openwrt-lean-6.1-X86-64 」 ${{ steps.tag.outputs.release_tag }}
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
@@ -227,8 +235,8 @@ jobs:
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
       with:
-        retain_days: 1
-        keep_minimum_runs: 20
+        retain_days: 90
+        keep_minimum_runs: 45
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@master
