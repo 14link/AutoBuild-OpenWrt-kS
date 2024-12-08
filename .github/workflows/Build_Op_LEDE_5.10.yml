@@ -227,7 +227,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
-        name: 「 openwrt-lean-6.1-X86-64 」 ${{ steps.tag.outputs.release_tag }}
+        name: 「 openwrt-lean-5.10-X86-64 」 ${{ steps.tag.outputs.release_tag }}
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
