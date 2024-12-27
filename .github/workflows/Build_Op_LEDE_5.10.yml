@@ -113,7 +113,7 @@ jobs:
         echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
         echo "src-git istore https://github.com/linkease/istore;main" >> ./feeds.conf.default
         echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
-        sed -i 's/PATCHVER:=6.1/PATCHVER:=5.10/g' target/linux/x86/Makefile
+        sed -i 's/PATCHVER:=6.12/PATCHVER:=5.10/g' target/linux/x86/Makefile
         sed -i 's/PATCHVER:=6.6/PATCHVER:=5.10/g' target/linux/x86/Makefile
     #    sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
         
