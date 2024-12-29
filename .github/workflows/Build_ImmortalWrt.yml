@@ -167,6 +167,7 @@ jobs:
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
         echo "FILE_TIME=$(date "+%Y年%m月%d日-%H点")" >> $GITHUB_ENV
+        echo "TAG_TIME=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
         
     - name: Check space usage
       if: (!cancelled())
@@ -222,16 +223,33 @@ jobs:
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
        
-    - name: Upload firmware to release
-      uses: softprops/action-gh-release@master
-      if: steps.tag.outputs.status == 'success' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+    # - name: Upload firmware to release
+      # uses: softprops/action-gh-release@master
+      # if: steps.tag.outputs.status == 'success' && !cancelled()
+      # env:
+        # GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      # with:
+        # name: 「 openwrt-IT-X86-64 」 ${{ steps.tag.outputs.release_tag }}
+        # tag_name: ${{ steps.tag.outputs.release_tag }}
+        # body_path: release.txt
+        # files: ${{ env.FIRMWARE }}/*
+
+    - name: 发布至release
+      id: release
+      uses: ncipollo/release-action@v1.14.0
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        name: 「 openwrt-IT-X86-64 」 ${{ steps.tag.outputs.release_tag }}
-        tag_name: ${{ steps.tag.outputs.release_tag }}
-        body_path: release.txt
-        files: ${{ env.FIRMWARE }}/*
+        name: ${{ env.FILE_TIME }}  「 openwrt-IT-X86-64 」
+        allowUpdates: true
+        tag: ${{ env.TAG_TIME }}
+        commit: main
+        token: ${{ secrets.REPO_TOKEN }}
+        body: |
+          功能介绍：该版本luci为2305，内核版本5.15，目前包含passwall、mosdns、Docker、lucky、微信推送等基础插件，其他功能可以用docker来实现，满足普通用户使用了。
+          [固件源码](https://github.com/coolsnowwolf/lede)
+          由衷感谢所有为openwrt无私奉献的大佬们
+          📥 固件下载
+        artifacts: ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
