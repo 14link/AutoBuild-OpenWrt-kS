@@ -63,13 +63,13 @@ jobs:
         echo "--------------------------硬盘信息--------------------------"
         echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT  
      
-    - name: free disk space
-      run: | 
-        sudo swapoff -a
-        sudo rm -f /swapfile
-        sudo apt clean
-        docker rmi $(docker image ls -aq)
-        df -h
+    # - name: free disk space
+      # run: | 
+        # sudo swapoff -a
+        # sudo rm -f /swapfile
+        # sudo apt clean
+        # docker rmi $(docker image ls -aq)
+        # df -h
 
     - name: Initialization environment
       env:
@@ -88,19 +88,19 @@ jobs:
         echo " 系统空间      类型   总数  已用  可用 使用率"
         df -hT $PWD
 
-    # - name: 释放Ubuntu磁盘空间
-      # uses: jlumbroso/free-disk-space@main
-      # with:
-        # # this might remove tools that are actually needed,
-        # # if set to "true" but frees about 6 GB
-        # tool-cache: false
-        # # all of these default to true, but feel free to set to
-        # # "false" if necessary for your workflow
-        # android: true
-        # dotnet: true
-        # haskell: true
-        # large-packages: true
-        # swap-storage: true
+    - name: 释放Ubuntu磁盘空间
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: false
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
 
     - name: Clone source code
       env: 
