@@ -91,8 +91,8 @@ jobs:
         echo " 系统空间      类型   总数  已用  可用 使用率"
         df -hT $PWD
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt update
-        sudo apt install clang gcc-13 g++-13
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install clang gcc-13 g++-13
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130
         sudo update-alternatives --config gcc
