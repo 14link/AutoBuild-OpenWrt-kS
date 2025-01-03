@@ -91,6 +91,8 @@ jobs:
         echo
         echo " 系统空间      类型   总数  已用  可用 使用率"
         df -hT $PWD
+        gcc --version
+        g++ --version
 
     - name: 释放Ubuntu磁盘空间
       uses: jlumbroso/free-disk-space@main
