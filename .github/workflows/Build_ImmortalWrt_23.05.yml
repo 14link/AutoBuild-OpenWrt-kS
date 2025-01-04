@@ -108,8 +108,8 @@ jobs:
         # "false" if necessary for your workflow
         android: true
         dotnet: true
-        haskell: false
-        large-packages: true
+        haskell: true
+        large-packages: false
         swap-storage: true
 
     - name: Clone source code
