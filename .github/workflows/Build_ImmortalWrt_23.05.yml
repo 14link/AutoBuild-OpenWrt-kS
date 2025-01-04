@@ -105,6 +105,8 @@ jobs:
         echo
         echo " 系统空间      类型   总数  已用  可用 使用率"
         df -hT $PWD
+        sudo update-alternatives --config clang
+        sudo update-alternatives --config clang++        
         clang --version
         clang++ --version
 
