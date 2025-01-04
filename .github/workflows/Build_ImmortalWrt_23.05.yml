@@ -65,6 +65,8 @@ jobs:
      
     # - name: free disk space
       # run: | 
+        # echo " 系统空间      类型   总数  已用  可用 使用率"
+        # df -hT $PWD
         # sudo swapoff -a
         # sudo rm -f /swapfile
         # sudo apt clean
