@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build_OpenWrt_lede_5.10
+name: Build_OpenWrt_ImmortalWrt_22.03
 
 # Add a button to trigger the workflow
 on:
@@ -42,8 +42,8 @@ env:
 
 jobs:
   build:
-    name: Build_OpenWrt_lede_5.10
-    runs-on: ubuntu-22.04
+    name: Build_ImmortalWrt-22.03
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout
@@ -65,11 +65,55 @@ jobs:
      
     # - name: free disk space
       # run: | 
+        # echo " 系统空间      类型   总数  已用  可用 使用率"
+        # df -hT $PWD
         # sudo swapoff -a
         # sudo rm -f /swapfile
         # sudo apt clean
         # docker rmi $(docker image ls -aq)
         # df -h
+
+    - name: 释放Ubuntu磁盘空间
+      uses: 14link/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: true
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        docker rmi `docker images -q`
+        [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"        
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang-18 cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
+        sudo -E apt-get -qq autoremove clang-11 clang++-11        
+        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+        sudo update-alternatives --config clang
+        sudo update-alternatives --config clang++
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        echo
+        echo " 系统空间      类型   总数  已用  可用 使用率"
+        df -hT $PWD
+        sudo update-alternatives --config clang
+        sudo update-alternatives --config clang++    
+        clang --version
+        clang++ --version
 
     # - name: 释放Ubuntu磁盘空间
       # uses: jlumbroso/free-disk-space@main
@@ -82,67 +126,37 @@ jobs:
         # android: true
         # dotnet: true
         # haskell: true
-        # large-packages: true
+        # large-packages: false
         # swap-storage: true
-
-    - name: Initialization environment
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-        sudo docker image prune --all --force
-        sudo -E apt-get -qq update
-        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
-        sudo timedatectl set-timezone "$TZ"
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
-        echo
-        echo " 系统空间      类型   总数  已用  可用 使用率"
-        df -hT $PWD
-
-    - name: 释放Ubuntu磁盘空间
-      uses: jlumbroso/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: false
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        swap-storage: true
 
     - name: Clone source code
       env: 
-        REPO_URL: https://github.com/coolsnowwolf/lede
-        REPO_BRANCH: master
+        REPO_URL: https://github.com/immortalwrt/immortalwrt
+        REPO_BRANCH: openwrt-22.03
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
-        echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
         echo "src-git istore https://github.com/linkease/istore;main" >> ./feeds.conf.default
-        echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
-        sed -i 's/PATCHVER:=6.12/PATCHVER:=5.10/g' target/linux/x86/Makefile
-        sed -i 's/PATCHVER:=6.6/PATCHVER:=5.10/g' target/linux/x86/Makefile
-    #    sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
+        echo "src-git diypkg https://github.com/14link/diy-package;imm-23.05" >> ./feeds.conf.default
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
         
-    - name: 缓存加速
-      uses: stupidloud/cachewrtbuild@main
-      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
-      with:
-        ccache: 'true'
-        prefix: ${{ github.workspace }}/openwrt
+    # - name: 缓存加速
+      # uses: stupidloud/cachewrtbuild@main
+      # if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
+      # with:
+        # ccache: 'true'
+        # prefix: ${{ github.workspace }}/openwrt
 
     - name: Update & Install feeds & del double feeds 
       working-directory: ./openwrt
       run: |
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a 
+        git clone https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
+        rm -rf feeds/packages/net/v2ray-geodata
+        git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
+        git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
+
 
     #- name: Import external feeds - passwall
     #  working-directory: ./openwrt
@@ -157,10 +171,10 @@ jobs:
 
     - name: Configuration Customization - Build_x86_64
       env:
-        CONFIG_FILE: 'x86_64.config'
+        CONFIG_FILE: 'Imm-2305.config'
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x ./customize.sh && ./customize.sh
+        chmod +x ./Imm-customize.sh && ./Imm-customize.sh
         cd openwrt && make defconfig
         
     - name: Download package
@@ -236,12 +250,23 @@ jobs:
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
        
+    # - name: Upload firmware to release
+      # uses: softprops/action-gh-release@master
+      # if: steps.tag.outputs.status == 'success' && !cancelled()
+      # env:
+        # GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      # with:
+        # name: 「 openwrt-IT-X86-64 」 ${{ steps.tag.outputs.release_tag }}
+        # tag_name: ${{ steps.tag.outputs.release_tag }}
+        # body_path: release.txt
+        # files: ${{ env.FIRMWARE }}/*
+
     - name: 发布至release
       id: release
       uses: ncipollo/release-action@v1.14.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        name: ${{ env.FILE_TIME }}  「 openwrt-lean-5.10-X86-64 」
+        name: ${{ env.FILE_TIME }}  「 openwrt-ImmortalWrt_22.03-X86-64 」
         allowUpdates: true
         tag: ${{ env.TAG_TIME }}
         commit: main
@@ -252,7 +277,6 @@ jobs:
           由衷感谢所有为openwrt无私奉献的大佬们
           📥 固件下载
         artifacts: ${{ env.FIRMWARE }}/*
-
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
