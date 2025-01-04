@@ -99,7 +99,7 @@ jobs:
         clang++ --version
 
     - name: 释放Ubuntu磁盘空间
-      uses: jlumbroso/free-disk-space@main
+      uses: 14link/free-disk-space@main
       with:
         # this might remove tools that are actually needed,
         # if set to "true" but frees about 6 GB
@@ -109,7 +109,7 @@ jobs:
         android: true
         dotnet: true
         haskell: true
-        large-packages: false
+        large-packages: true
         swap-storage: true
 
     - name: Clone source code
