@@ -65,27 +65,11 @@ jobs:
      
     # - name: free disk space
       # run: | 
-        # echo " 系统空间      类型   总数  已用  可用 使用率"
-        # df -hT $PWD
         # sudo swapoff -a
         # sudo rm -f /swapfile
         # sudo apt clean
         # docker rmi $(docker image ls -aq)
         # df -h
-
-    - name: 释放Ubuntu磁盘空间
-      uses: 14link/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: true
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        swap-storage: true
 
     - name: Initialization environment
       env:
@@ -94,11 +78,7 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
         sudo docker image prune --all --force
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang-18 cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
-        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 110
-        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 110
-        sudo update-alternatives --config clang
-        sudo update-alternatives --config clang++
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang clang clangd cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -107,11 +87,6 @@ jobs:
         echo
         echo " 系统空间      类型   总数  已用  可用 使用率"
         df -hT $PWD
-        sudo update-alternatives --config clang
-        sudo update-alternatives --config clang++    
-        sudo -E apt-get -qq autoremove clang-11 clang++-11        
-        clang --version
-        clang++ --version
 
     # - name: 释放Ubuntu磁盘空间
       # uses: jlumbroso/free-disk-space@main
@@ -140,12 +115,12 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
-    # - name: 缓存加速
-      # uses: stupidloud/cachewrtbuild@main
-      # if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
-      # with:
-        # ccache: 'true'
-        # prefix: ${{ github.workspace }}/openwrt
+    - name: 缓存加速
+      uses: stupidloud/cachewrtbuild@main
+      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
+      with:
+        ccache: 'true'
+        prefix: ${{ github.workspace }}/openwrt
 
     - name: Update & Install feeds & del double feeds 
       working-directory: ./openwrt
@@ -169,7 +144,7 @@ jobs:
 
     - name: Configuration Customization - Build_x86_64
       env:
-        CONFIG_FILE: 'Imm-2410.config'
+        CONFIG_FILE: 'Imm-x86_64.config'
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./Imm-customize.sh && ./Imm-customize.sh
