@@ -80,7 +80,7 @@ jobs:
         echo "Deleting files, please wait ..."      
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL https://github.com/14link/openwrt-list/raw/master/lienol-2410)
+        sudo -E apt-get -qq install $(curl -fsSL https://github.com/14link/openwrt-list/raw/master/lienol-241)
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -238,7 +238,7 @@ jobs:
         commit: main
         token: ${{ secrets.REPO_TOKEN }}
         body: |
-          功能介绍：该版本luci为2305，内核版本5.15，目前包含passwall、mosdns、Docker、lucky、微信推送等基础插件，其他功能可以用docker来实现，满足普通用户使用了。
+          功能介绍：该版本luci为2410，内核版本6.1，目前包含passwall、mosdns、Docker、lucky、微信推送等基础插件，其他功能可以用docker来实现，满足普通用户使用了。
           [固件源码](https://github.com/immortalwrt/immortalwrt)
           由衷感谢所有为openwrt无私奉献的大佬们
           📥 固件下载
