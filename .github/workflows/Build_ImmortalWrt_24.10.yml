@@ -131,7 +131,7 @@ jobs:
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
         echo "src-git istore https://github.com/linkease/istore;main" >> ./feeds.conf.default
-        echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
+        echo "src-git diypkg https://github.com/14link/diy-package;leo" >> ./feeds.conf.default
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
