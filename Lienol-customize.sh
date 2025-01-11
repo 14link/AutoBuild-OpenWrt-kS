@@ -25,3 +25,5 @@ sed -i "s/hostname='OpenWrt'/hostname='LienolWrt'/g" openwrt/package/base-files/
         # git clone https://github.com/sirpdboy/luci-app-netdata package/luci-app-netdata
         # git clone -b 18.06 https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
         # sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
+# 更换默认主题
+# sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' ./feeds/luci/collections/luci/Makefile
