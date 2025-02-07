@@ -124,9 +124,11 @@ jobs:
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
-        echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
         echo "src-git istore https://github.com/linkease/istore;main" >> ./feeds.conf.default
         echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
+        git clone https://github.com/xiaorouji/openwrt-passwall-packages.git package/passwall-packages
+        git clone https://github.com/xiaorouji/openwrt-passwall package/luci-app-passwall
+    #    echo "src-git small https://github.com/kenzok8/small" >> ./feeds.conf.default
     #    sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
         
     - name: 缓存加速
