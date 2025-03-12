@@ -6,7 +6,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 # fix bios boot partition is under 1 MiB
-sed -i 's/256/1024/g' target/linux/x86/image/Makefile
+# sed -i 's/256/1024/g' target/linux/x86/image/Makefile
 #1. Modify default IP
 #sed -i 's/192.168.1.1/192.168.5.1/g' openwrt/package/base-files/files/bin/config_generate
 sed -i 's/192.168.1.1/192.168.0.252/g' openwrt/package/base-files/files/bin/config_generate
