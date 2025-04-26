@@ -277,11 +277,14 @@ jobs:
           📥 固件下载
         artifacts: ${{ env.FIRMWARE }}/*
 
-    - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@main
+    - name: Delete releases and workflows runs
+      uses: ophub/delete-releases-workflows@main
       with:
-        retain_days: 90
-        keep_minimum_runs: 45
+        delete_releases: true
+        releases_keep_latest: 55
+        delete_workflows: true
+        workflows_keep_day: 77
+        gh_token: ${{ secrets.REPO_TOKEN }}
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@master
