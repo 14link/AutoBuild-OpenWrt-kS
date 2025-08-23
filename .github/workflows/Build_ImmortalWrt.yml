@@ -125,8 +125,8 @@ jobs:
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
         echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
-        sed -i '1i src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main' feeds.conf.default
-        sed -i '2i src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;main' feeds.conf.default
+        sed -i '1i src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;25.2.12-1' feeds.conf.default
+        sed -i '2i src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;25.2.12-1' feeds.conf.default
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
@@ -142,8 +142,8 @@ jobs:
       run: |
         find ./ | grep Makefile | grep v2ray-geodata | xargs rm -f
         find ./ | grep Makefile | grep mosdns | xargs rm -f
-        git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
-        git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
+        git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns;v5.3.3-3
+        git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata;v5.3.3-3
     #    git clone https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
     #    rm -rf feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-libev,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,trojan-plus,tuic-client,v2ray-plugin,xray-plugin,geoview,shadow-tls}
     #    git clone https://github.com/xiaorouji/openwrt-passwall-packages package/passwall-packages
