@@ -127,6 +127,8 @@ jobs:
         echo "src-git diypkg https://github.com/14link/diy-package" >> ./feeds.conf.default
         sed -i 's/KERNEL_TESTING_PATCHVER:=.*/KERNEL_TESTING_PATCHVER:=6.6/g' ./target/linux/x86/Makefile
         sed -i 's/KERNEL_PATCHVER:=.*/KERNEL_PATCHVER:=6.6/g' ./target/linux/x86/Makefile
+        sed -i '1i src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main' feeds.conf.default
+        sed -i '2i src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;main' feeds.conf.default
     #    sed -i 's/KERNEL_TESTING_PATCHVER:=.*/KERNEL_TESTING_PATCHVER:=5.15/g' ./target/linux/x86/Makefile
     #    sed -i 's/KERNEL_PATCHVER:=.*/KERNEL_PATCHVER:=5.15/g' ./target/linux/x86/Makefile
     #    sed -i 's/PATCHVER:=.*/PATCHVER:=5.15/g' target/linux/x86/Makefile
