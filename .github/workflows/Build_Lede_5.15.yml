@@ -260,7 +260,7 @@ jobs:
         commit: main
         token: ${{ secrets.REPO_TOKEN }}
         body: |
-          功能介绍：该版本luci为23.05，内核版本5.15，目前包含passwall、mosdns、Docker、iStore商店等基础插件，其他插件可以用iStore商店安装，满足普通用户使用了。
+          功能介绍：该版本luci为23.05，内核版本5.15，目前包含Passwall、SSR、Mosdns、Docker、iStore商店等基础插件，其他插件可以用iStore商店安装，满足普通用户使用了。
           [固件源码](https://github.com/immortalwrt/immortalwrt)
           由衷感谢所有为openwrt无私奉献的大佬们
           📥 固件下载
