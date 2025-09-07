@@ -254,7 +254,7 @@ jobs:
       uses: ncipollo/release-action@v1.14.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        name: ${{ env.FILE_TIME }}  「 OpenWRT-LEDE-X86-64 」
+        name: ${{ env.FILE_TIME }}  「 OpenWRT-LEDE-6.6-X86-64 」
         allowUpdates: true
         tag: ${{ env.TAG_TIME }}
         commit: main
