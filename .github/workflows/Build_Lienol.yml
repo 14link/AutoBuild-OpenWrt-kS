@@ -126,10 +126,10 @@ jobs:
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         cd openwrt
-        echo "src-git diypkg https://github.com/14link/diy-package;leo" >> ./feeds.conf.default
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
-        
+        echo "src-git diypkg https://github.com/14link/diy-package;leo-23.05" >> ./feeds.conf.default
+        sed -i '1i src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main' feeds.conf.default
+        sed -i '2i src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;main' feeds.conf.default
+
     # - name: 缓存加速
       # uses: stupidloud/cachewrtbuild@main
       # if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
@@ -140,11 +140,8 @@ jobs:
     - name: Update & Install feeds & del double feeds 
       working-directory: ./openwrt
       run: |
-        git clone https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
-        rm -rf feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-libev,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,trojan-plus,tuic-client,v2ray-plugin,xray-plugin,geoview,shadow-tls}
-        git clone https://github.com/xiaorouji/openwrt-passwall-packages package/passwall-packages
-        rm -rf feeds/luci/applications/luci-app-passwall
-        git clone https://github.com/xiaorouji/openwrt-passwall package/passwall-luci
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
         rm -rf feeds/packages/lang/golang
         git clone https://github.com/sbwml/packages_lang_golang -b 24.x feeds/packages/lang/golang
         rm -rf feeds/packages/net/v2ray-geodata
@@ -249,13 +246,13 @@ jobs:
       uses: ncipollo/release-action@v1.14.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        name: ${{ env.FILE_TIME }}  「 openwrt-Lienol-X86-64 」
+        name: ${{ env.FILE_TIME }}  「 OpenWRT-Lienol-23.05-X86-64 」
         allowUpdates: true
         tag: ${{ env.TAG_TIME }}
         commit: main
         token: ${{ secrets.REPO_TOKEN }}
         body: |
-          功能介绍：该版本luci为2305，内核版本5.15，目前包含passwall、mosdns、Docker、lucky、微信推送等基础插件，其他功能可以用docker来实现，满足普通用户使用了。
+          功能介绍：该版本luci为23.05，内核版本5.15，目前包含Passwall、Mosdns、Docker、lucky、微信推送等基础插件，其他功能可以用docker来实现，满足普通用户使用了。
           [固件源码](https://github.com/immortalwrt/immortalwrt)
           由衷感谢所有为openwrt无私奉献的大佬们
           📥 固件下载

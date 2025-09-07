@@ -71,6 +71,20 @@ jobs:
         # docker rmi $(docker image ls -aq)
         # df -h
 
+    # - name: 释放Ubuntu磁盘空间
+      # uses: jlumbroso/free-disk-space@main
+      # with:
+        # # this might remove tools that are actually needed,
+        # # if set to "true" but frees about 6 GB
+        # tool-cache: false
+        # # all of these default to true, but feel free to set to
+        # # "false" if necessary for your workflow
+        # android: true
+        # dotnet: true
+        # haskell: true
+        # large-packages: true
+        # swap-storage: true
+        
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -232,13 +246,13 @@ jobs:
       uses: ncipollo/release-action@v1.14.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        name: ${{ env.FILE_TIME }}  「 openwrt-Lienol-23.05-X86-64 」
+        name: ${{ env.FILE_TIME }}  「 OpenWRT-Lienol-23.05-X86-64 」
         allowUpdates: true
         tag: ${{ env.TAG_TIME }}
         commit: main
         token: ${{ secrets.REPO_TOKEN }}
         body: |
-          功能介绍：该版本luci为2305，内核版本5.15，目前包含passwall、mosdns、Docker、lucky、微信推送等基础插件，其他功能可以用docker来实现，满足普通用户使用了。
+          功能介绍：该版本luci为23.05，内核版本5.15，目前包含Passwall、Mosdns、Docker、lucky、微信推送等基础插件，其他功能可以用docker来实现，满足普通用户使用了。
           [固件源码](https://github.com/immortalwrt/immortalwrt)
           由衷感谢所有为openwrt无私奉献的大佬们
           📥 固件下载
