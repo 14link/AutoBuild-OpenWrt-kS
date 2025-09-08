@@ -30,3 +30,7 @@ sed -i "s/hostname='OpenWrt'/hostname='OpWrt-imm'/g" openwrt/package/base-files/
 # cp -f $GITHUB_WORKSPACE/banner package/base-files/files/etc/banner
 
 # echo "uci set luci.main.mediaurlbase=/luci-static/argon" >> $ZZZ
+
+# nano target/linux/generic/image/Makefile
+# VERSION=$(shell cat $(TOPDIR)/include/version.mk | grep '^VERSION:=' | cut -d'=' -f2)-$(shell date +%Y%m%d)
+#sed -i 's/^#\(.*helloworld\)/\1/' feeds.conf.default
