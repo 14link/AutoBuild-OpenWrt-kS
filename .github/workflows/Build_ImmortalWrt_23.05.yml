@@ -164,10 +164,10 @@ jobs:
 
     - name: Configuration Customization - Build_x86_64
       env:
-        CONFIG_FILE: 'Imm-23.05.config'
+        CONFIG_FILE: 'imm_23.05.config'
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x ./Imm-customize.sh && ./Imm-customize.sh
+        chmod +x ./imm_customize.sh && ./imm_customize.sh
         cd openwrt && make defconfig
         
     - name: Download package
