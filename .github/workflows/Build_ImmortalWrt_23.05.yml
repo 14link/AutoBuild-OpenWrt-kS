@@ -18,9 +18,10 @@ on:
     # branches: 
       # - main
 
-  # schedule:
-    # - cron: 0 0 10,25 * *
-
+  schedule:
+    - cron: 0 2 * * 5
+#    - cron: 0 0 * * 5,6,0
+  
   #watch:
   #  types: [started]
 
@@ -72,19 +73,19 @@ jobs:
         # docker rmi $(docker image ls -aq)
         # df -h
 
-    - name: 释放Ubuntu磁盘空间
-      uses: 14link/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: false
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        swap-storage: true
+    # - name: 释放Ubuntu磁盘空间
+      # uses: jlumbroso/free-disk-space@main
+      # with:
+        # # this might remove tools that are actually needed,
+        # # if set to "true" but frees about 6 GB
+        # tool-cache: false
+        # # all of these default to true, but feel free to set to
+        # # "false" if necessary for your workflow
+        # android: true
+        # dotnet: true
+        # haskell: true
+        # large-packages: true
+        # swap-storage: true
 
     - name: Initialization environment
       env:
@@ -266,7 +267,7 @@ jobs:
         commit: main
         token: ${{ secrets.REPO_TOKEN }}
         body: |
-          功能介绍：该版本luci为23.05，内核版本5.15，目前包含passwall、mosdns、Docker、iStore商店等基础插件，其他插件可以用iStore商店安装，满足普通用户使用了。
+          功能介绍：该版本luci为23.05，内核版本5.15，目前包含Passwall、Mosdns、Docker、iStore商店等基础插件，其他插件可以用iStore商店安装，满足普通用户使用了。
           [固件源码](https://github.com/immortalwrt/immortalwrt)
           由衷感谢所有为openwrt无私奉献的大佬们
           📥 固件下载
