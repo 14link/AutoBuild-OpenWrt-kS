@@ -73,19 +73,19 @@ jobs:
         # docker rmi $(docker image ls -aq)
         # df -h
 
-    - name: 释放Ubuntu磁盘空间
-      uses: 14link/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: false
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        swap-storage: true
+    # - name: 释放Ubuntu磁盘空间
+      # uses: jlumbroso/free-disk-space@main
+      # with:
+        # # this might remove tools that are actually needed,
+        # # if set to "true" but frees about 6 GB
+        # tool-cache: false
+        # # all of these default to true, but feel free to set to
+        # # "false" if necessary for your workflow
+        # android: true
+        # dotnet: true
+        # haskell: true
+        # large-packages: true
+        # swap-storage: true
 
     - name: Initialization environment
       env:
@@ -137,12 +137,12 @@ jobs:
     #    sed -i '1i src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main' feeds.conf.default
     #    sed -i '2i src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;main' feeds.conf.default
         
-    # - name: 缓存加速
-      # uses: stupidloud/cachewrtbuild@main
-      # if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
-      # with:
-        # ccache: 'true'
-        # prefix: ${{ github.workspace }}/openwrt
+    - name: 缓存加速
+      uses: stupidloud/cachewrtbuild@main
+      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
+      with:
+        ccache: 'true'
+        prefix: ${{ github.workspace }}/openwrt
 
     - name: Update & Install feeds & del double feeds 
       working-directory: ./openwrt
@@ -227,6 +227,7 @@ jobs:
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
+    #    find -name "*rootfs*" | xargs -i mv -f {} packages
     #    find -name "*sha256sums*" | xargs -i rm -rf {} packages
     #    find -name "*version.buildinfo*" | xargs -i rm -rf {} packages
     #    find -name "*feeds.buildinfo*" | xargs -i rm -rf {} packages
