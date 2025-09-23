@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: Build_OpenWrt_LEDE
+name: Build_OpenWrt_Lede
 
 # Add a button to trigger the workflow
 on:
@@ -42,7 +42,7 @@ env:
 
 jobs:
   build:
-    name: Build_OpenWrt_LEDE
+    name: Build_OpenWrt_Lede
     runs-on: ubuntu-22.04
 
     steps:
