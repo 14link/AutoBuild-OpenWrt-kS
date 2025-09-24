@@ -3,3 +3,4 @@
 .github/workflows/Build_ImmortalWrt_24.10.yml.bak
 .github/workflows/Build_Lede.yml.bak
 imm_23.05 - 复制.config
+imm_23.05_ssr.sh
