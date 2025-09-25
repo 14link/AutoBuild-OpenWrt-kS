@@ -10,3 +10,4 @@ x86_64.sh
 .github/workflows/Build_ImmortalWrt.yml.bak
 .github/workflows/Build_ImmortalWrt_24.10_pw.yml.bak
 .github/workflows/Build_ImmortalWrt_24.10_ssr.yml.bak
+.github/workflows/Build_ImmortalWrt_23.05_pw.yml.bak
