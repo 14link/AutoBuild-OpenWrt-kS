@@ -169,7 +169,7 @@ jobs:
 
     - name: Configuration Customization - Build_x86_64
       env:
-        CONFIG_FILE: 'imm_24.10_pw.config'
+        CONFIG_FILE: 'imm_23.05_pw.config'
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./imm_customize.sh && ./imm_customize.sh
