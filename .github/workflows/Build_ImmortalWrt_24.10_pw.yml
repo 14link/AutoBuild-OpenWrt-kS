@@ -1,0 +1,294 @@
+#=================================================
+# Description: Build OpenWrt using GitHub Actions
+# Lisence: MIT
+# Author: eSirPlayground
+# Youtube Channel: https://goo.gl/fvkdwm 
+#=================================================
+
+name: Build_OpenWrt_ImmortalWrt_24.10_pw
+
+# Add a button to trigger the workflow
+on:
+  repository_dispatch:
+  workflow_dispatch:
+#  release:
+#    types: [published]
+
+  # push:
+    # branches: 
+      # - main
+
+#  schedule:
+#    - cron: 0 0 * * 0
+#    - cron: 0 0 * * 5,6,0
+  
+  #watch:
+  #  types: [started]
+
+env:
+  UPLOAD_BIN_DIR: true
+  UPLOAD_FIRMWARE: true
+  UPLOAD_COWTRANSFER: false
+  UPLOAD_WETRANSFER: false
+  UPLOAD_RELEASE: true
+  CACHE_BUILD: true
+  TZ: Asia/Shanghai
+#  REPO_URL: https://github.com/coolsnowwolf/lede
+#  REPO_BRANCH: master
+#  FEEDS_CONF: feeds.conf.default
+#  CONFIG_FILE: x86_64.config
+#  DIY_P1_SH: diy-part1-lede.sh
+#  DIY_P2_SH: diy-p2-lede.sh
+
+jobs:
+  build:
+    name: Build_ImmortalWrt-24.10_pw
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Check Server Performance
+      run: |
+        echo "警告⚠"
+        echo "分配的服务器性能有限，若选择的插件过多，务必注意CPU性能！"
+        echo -e "已知CPU型号（降序）：AMD EPYC 7763, 8370C，8272CL，8171M，E5-2673 \n"
+        echo "--------------------------CPU信息--------------------------"
+        echo "CPU物理数量：$(cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l)"
+        echo -e "CPU核心信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+        echo "--------------------------内存信息--------------------------"
+        echo "已安装内存详细信息："
+        echo -e "$(sudo lshw -short -C memory | grep GiB) \n"
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT  
+     
+    # - name: free disk space
+      # run: | 
+        # echo " 系统空间      类型   总数  已用  可用 使用率"
+        # df -hT $PWD
+        # sudo swapoff -a
+        # sudo rm -f /swapfile
+        # sudo apt clean
+        # docker rmi $(docker image ls -aq)
+        # df -h
+
+    # - name: 释放Ubuntu磁盘空间
+      # uses: jlumbroso/free-disk-space@main
+      # with:
+        # # this might remove tools that are actually needed,
+        # # if set to "true" but frees about 6 GB
+        # tool-cache: false
+        # # all of these default to true, but feel free to set to
+        # # "false" if necessary for your workflow
+        # android: true
+        # dotnet: true
+        # haskell: true
+        # large-packages: true
+        # swap-storage: true
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        echo
+        echo " 系统空间      类型   总数  已用  可用 使用率"
+        df -hT $PWD
+    #    sudo update-alternatives --config clang
+    #    sudo update-alternatives --config clang++    
+    #    clang --version
+    #    clang++ --version
+
+    - name: 释放Ubuntu磁盘空间
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: false
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
+
+    - name: Clone source code
+      env: 
+        REPO_URL: https://github.com/immortalwrt/immortalwrt
+        REPO_BRANCH: 'openwrt-24.10'
+      run: |
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        cd openwrt
+        echo "src-git diypkg https://github.com/14link/diy-package;imm-23.05" >> ./feeds.conf.default
+        echo "src-git istore https://github.com/linkease/istore;main" >> ./feeds.conf.default
+        echo "src-git helloworld https://github.com/fw876/helloworld.git" >> "feeds.conf.default"
+    #    sed -i "/helloworld/d" "feeds.conf.default"
+    #    sed -i '1i src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main' feeds.conf.default
+    #    sed -i '2i src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;main' feeds.conf.default
+        
+    - name: 缓存加速
+      uses: stupidloud/cachewrtbuild@main
+      if: env.CACHE_BUILD == 'true' || (github.event.inputs.CACHE_BUILD == 'true')
+      with:
+        ccache: 'true'
+        prefix: ${{ github.workspace }}/openwrt
+
+    - name: Update & Install feeds & del double feeds 
+      working-directory: ./openwrt
+      run: |
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        rm -rf feeds/packages/lang/golang
+        git clone https://github.com/sbwml/packages_lang_golang -b 24.x feeds/packages/lang/golang
+        rm -rf feeds/packages/net/v2ray-geodata
+        git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
+        git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
+    #    git clone https://github.com/kiddin9/luci-theme-edge.git package/luci-theme-edge
+
+    #- name: Import external feeds - passwall
+    #  working-directory: ./openwrt
+    #  run: |
+    #    git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
+    #    git clone "your_github_link" package/"your_folder_name"      
+
+    #- name: Import external feeds - JerryKuKu Argon
+    #  working-directory: ./openwrt
+    #  run: |
+    #    git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
+
+    - name: Configuration Customization - Build_x86_64
+      env:
+        CONFIG_FILE: 'imm_24.10_pw.config'
+      run: |
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x ./imm_customize.sh && ./imm_customize.sh
+        cd openwrt && make defconfig
+        
+    - name: Download package
+      working-directory: ./openwrt
+      run: |
+        make download -j$(nproc)
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+        
+    - name: Build firmware
+      working-directory: ./openwrt
+      run: |
+        echo -e "$(nproc) thread build."
+        make -j$(nproc) || make -j1 || make -j1 V=s
+        echo "status=success" >> $GITHUB_OUTPUT
+        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
+        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        echo "FILE_TIME=$(date "+%Y年%m月%d日-%H点")" >> $GITHUB_ENV
+        echo "TAG_TIME=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        
+    - name: Check space usage
+      if: (!cancelled())
+      run: df -hT
+      
+    - name : Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt${{ env.FILE_DATE }}
+        path: openwrt/bin
+
+    - name: Upload bin directory
+      uses: actions/upload-artifact@main
+      with:
+        name: OpenWrt_ipk${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: openwrt/bin/packages/x86_64
+        
+    - name: Organize files
+      id: organize
+      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      run: |
+        cd openwrt/bin/targets/*/*
+        rm -rf packages && mkdir packages
+        find -name "*esxi-flat.vmdk*" | xargs -i mv -f {} packages
+        find -name "*kernel.bin*" | xargs -i mv -f {} packages
+        find -name "*rootfs.img*" | xargs -i mv -f {} packages
+        find -name "*.manifest*" | xargs -i mv -f {} packages
+        find -name "*vmlinuz*" | xargs -i mv -f {} packages
+        find -name "*esxi.vmdk*" | xargs -i mv -f {} packages      
+        find -name "*profiles.json*" | xargs -i rm -rf {}
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    #    find -name "*rootfs*" | xargs -i mv -f {} packages
+    #    find -name "*sha256sums*" | xargs -i rm -rf {} packages
+    #    find -name "*version.buildinfo*" | xargs -i rm -rf {} packages
+    #    find -name "*feeds.buildinfo*" | xargs -i rm -rf {} packages
+
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@main
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: ${{ env.FIRMWARE }}
+ 
+    - name: Generate release tag
+      id: tag
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+        touch release.txt
+        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
+        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+        echo "status=success" >> $GITHUB_OUTPUT
+       
+    # - name: Upload firmware to release
+      # uses: softprops/action-gh-release@master
+      # if: steps.tag.outputs.status == 'success' && !cancelled()
+      # env:
+        # GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      # with:
+        # name: 「 openwrt-IT-X86-64 」 ${{ steps.tag.outputs.release_tag }}
+        # tag_name: ${{ steps.tag.outputs.release_tag }}
+        # body_path: release.txt
+        # files: ${{ env.FIRMWARE }}/*
+
+    - name: 发布至release
+      id: release
+      uses: ncipollo/release-action@v1.14.0
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        name: ${{ env.FILE_TIME }}  「 OpenWrt-ImmortalWrt_24.10-X86-64 」
+        allowUpdates: true
+        tag: ${{ env.TAG_TIME }}
+        commit: main
+        token: ${{ secrets.REPO_TOKEN }}
+        body: |
+          功能介绍：该版本luci为24.10，内核版本6.6，目前包含Passwall、Mosdns、Docker、iStore商店等基础插件，其他插件可以用iStore商店安装，满足普通用户使用了。
+          [固件源码](https://github.com/immortalwrt/immortalwrt)
+          由衷感谢所有为openwrt无私奉献的大佬们
+          📥 固件下载
+        artifacts: ${{ env.FIRMWARE }}/*
+
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@main
+      with:
+        retain_days: 90
+        keep_minimum_runs: 45
+
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@master
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        keep_latest: 25
+        delete_expired_data: 20 # Optional parameters
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
