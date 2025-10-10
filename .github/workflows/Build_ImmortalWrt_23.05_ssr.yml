@@ -279,7 +279,7 @@ jobs:
         delete_releases: true
         releases_keep_latest: 55
         delete_workflows: true
-        workflows_keep_day: 77
+        workflows_keep_day: 99
         gh_token: ${{ secrets.REPO_TOKEN }}
 
     - name: Remove old Releases
