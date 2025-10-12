@@ -134,11 +134,9 @@ jobs:
     #    sed -i 's/KERNEL_TESTING_PATCHVER:=.*/KERNEL_TESTING_PATCHVER:=5.15/g' ./target/linux/x86/Makefile
     #    sed -i 's/KERNEL_PATCHVER:=.*/KERNEL_PATCHVER:=5.15/g' ./target/linux/x86/Makefile
     #    sed -i 's/PATCHVER:=.*/PATCHVER:=5.15/g' target/linux/x86/Makefile
-    #    sed -i 's/PATCHVER:=.*/PATCHVER:=5.15/g' target/linux/x86/Makefile
-    #    sed -i 's/KERNEL_TESTING_PATCHVER:=.*/KERNEL_TESTING_PATCHVER:=6.1/g' ./target/linux/x86/Makefile
-    #    sed -i 's/KERNEL_PATCHVER:=.*/KERNEL_PATCHVER:=6.1/g' ./target/linux/x86/Makefile
+    #    sed -i 's/KERNEL_TESTING_PATCHVER:=.*/KERNEL_TESTING_PATCHVER:=6.6/g' ./target/linux/x86/Makefile
+    #    sed -i 's/KERNEL_PATCHVER:=.*/KERNEL_PATCHVER:=6.6/g' ./target/linux/x86/Makefile
     #    sed -i 's/PATCHVER:=6.12/PATCHVER:=5.15/g' target/linux/x86/Makefile
-    #    sed -i 's/PATCHVER:=6.6/PATCHVER:=6.1/g' target/linux/x86/Makefile
     #    echo "src-git istore https://github.com/linkease/istore;main" >> ./feeds.conf.default
     #    git clone https://github.com/xiaorouji/openwrt-passwall-packages.git package/passwall-packages
     #    git clone https://github.com/xiaorouji/openwrt-passwall package/luci-app-passwall
@@ -270,9 +268,9 @@ jobs:
       uses: ophub/delete-releases-workflows@main
       with:
         delete_releases: true
-        releases_keep_latest: 55
+        releases_keep_latest: 45
         delete_workflows: true
-        workflows_keep_day: 99
+        workflows_keep_day: 45
         gh_token: ${{ secrets.REPO_TOKEN }}
 
     - name: Remove old Releases
