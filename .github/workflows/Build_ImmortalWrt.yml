@@ -274,9 +274,9 @@ jobs:
       uses: ophub/delete-releases-workflows@main
       with:
         delete_releases: true
-        releases_keep_latest: 55
+        releases_keep_latest: 45
         delete_workflows: true
-        workflows_keep_day: 77
+        workflows_keep_day: 45
         gh_token: ${{ secrets.REPO_TOKEN }}
 
     - name: Remove old Releases
@@ -284,7 +284,7 @@ jobs:
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 25
-        delete_expired_data: 20 # Optional parameters
+        delete_expired_data: 25 # Optional parameters
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
