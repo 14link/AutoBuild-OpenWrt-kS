@@ -150,7 +150,7 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         rm -rf feeds/packages/lang/golang
-        git clone https://github.com/sbwml/packages_lang_golang -b 24.x feeds/packages/lang/golang
+        git clone https://github.com/sbwml/packages_lang_golang -b 26.x feeds/packages/lang/golang
         rm -rf feeds/packages/net/v2ray-geodata
         git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
         git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
@@ -262,7 +262,7 @@ jobs:
 
     - name: 发布至release
       id: release
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@v1.21.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         name: ${{ env.FILE_TIME }}  「 OpenWrt-ImmortalWrt_24.10-X86-64 」
