@@ -262,7 +262,7 @@ jobs:
 
     - name: 发布至release
       id: release
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@v1.21.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         name: ${{ env.FILE_TIME }}  「 OpenWrt-ImmortalWrt_24.10-X86-64 」
